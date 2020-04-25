@@ -11,13 +11,15 @@ using AppQuiz.Application.Questions.Commands.Create;
 using AppQuiz.Application.Questions.Commands.Delete;
 using AppQuiz.Application.Questions.Commands.Update;
 using AppQuiz.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AppQuiz.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("questions")]
-    public class QuestionsController : ControllerBase
+    public class QuestionsController : Controller
     {
         private readonly IMediator _mediator;
         private readonly ILogger<QuestionsController> _logger;

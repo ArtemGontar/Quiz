@@ -1,8 +1,7 @@
-﻿using AppQuiz.Application.Quizzes.Queries.GetAll;
-using AppQuiz.Application.Quizzes.Queries.GetById;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -10,8 +9,9 @@ using System.Threading.Tasks;
 using AppQuiz.Application.Quizzes.Commands.Create;
 using AppQuiz.Application.Quizzes.Commands.Delete;
 using AppQuiz.Application.Quizzes.Commands.Update;
+using AppQuiz.Application.Quizzes.Queries.GetAll;
+using AppQuiz.Application.Quizzes.Queries.GetById;
 using AppQuiz.Domain;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace AppQuiz.Api.Controllers
 {

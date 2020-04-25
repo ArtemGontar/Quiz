@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Quiz.Application\AppQuiz.Application.csproj" />
-    <ProjectReference Include="..\Quiz.Domain\AppQuiz.Domain.csproj" />
-    <ProjectReference Include="..\Quiz.Persistence\AppQuiz.Persistence.csproj" />
+    <ProjectReference Include="..\AppQuiz.Application\AppQuiz.Application.csproj" />
+    <ProjectReference Include="..\AppQuiz.Domain\AppQuiz.Domain.csproj" />
+    <ProjectReference Include="..\AppQuiz.Persistence\AppQuiz.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
