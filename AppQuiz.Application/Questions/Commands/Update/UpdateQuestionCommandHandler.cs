@@ -1,7 +1,7 @@
 ﻿using AppQuiz.Domain;
-using AppQuiz.Persistence.Abstractions;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Shared.Persistence.MongoDb;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

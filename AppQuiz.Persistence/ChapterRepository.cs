@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Text;
 using System.Threading.Tasks;
 using AppQuiz.Domain;
 using MongoDB.Driver;
@@ -6,17 +9,14 @@ using Shared.Persistence.MongoDb;
 
 namespace AppQuiz.Persistence
 {
-    public class QuizRepository : Repository<Quiz>
+    public class ChapterRepository : Repository<Chapter>
     {
-        public QuizRepository(IMongoCollection<Quiz> mongoCollection) : base(mongoCollection)
+        public ChapterRepository(QuizDbContext context) : base(context)
         {
-        }
-        public QuizRepository(QuizDbContext context)
-            : base(context)
-        {
+            
         }
 
-        public override async Task<bool> SaveAsync(Quiz entity)
+        public override async Task<bool> SaveAsync(Chapter entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
@@ -25,15 +25,15 @@ namespace AppQuiz.Persistence
                 entity.Id = Guid.NewGuid();
 
             var update = Update
-                .Set(x => x.Title, entity.Title)
+                .Set(x => x.Name, entity.Name)
                 .Set(x => x.OwnerId, entity.OwnerId);
-                
+
             var result = await Collection.UpdateOneAsync(FilterId(entity.Id), update, OptionUpsert);
 
             return IsUpdated(result);
         }
 
-        public override async Task<bool> DeleteAsync(ISpecification<Quiz> specification)
+        public override async Task<bool> DeleteAsync(ISpecification<Chapter> specification)
         {
             var result = await Collection.DeleteOneAsync(specification.Predicate);
 

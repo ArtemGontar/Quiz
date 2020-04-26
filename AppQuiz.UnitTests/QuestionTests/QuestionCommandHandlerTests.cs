@@ -1,18 +1,16 @@
 ﻿using AppQuiz.Application.Questions.Commands.Create;
 using AppQuiz.Application.Questions.Commands.Delete;
 using AppQuiz.Application.Questions.Commands.Update;
+using AppQuiz.Application.Questions.Queries.GetAll;
+using AppQuiz.Application.Questions.Queries.GetById;
 using AppQuiz.Domain;
-using AppQuiz.Persistence.Abstractions;
 using Moq;
 using Moq.AutoMock;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using AppQuiz.Application.Questions.Queries.GetAll;
-using AppQuiz.Application.Questions.Queries.GetById;
-using AppQuiz.Application.Quizzes.Queries.GetAll;
-using AppQuiz.Application.Quizzes.Queries.GetById;
+using Shared.Persistence.MongoDb;
 using Xunit;
 
 namespace AppQuiz.UnitTests.QuestionTests

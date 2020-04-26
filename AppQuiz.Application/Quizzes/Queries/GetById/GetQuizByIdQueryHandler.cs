@@ -1,10 +1,10 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using AppQuiz.Application.Quizzes.Specifications;
+﻿using AppQuiz.Application.Quizzes.Specifications;
 using AppQuiz.Domain;
-using AppQuiz.Persistence.Abstractions;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Shared.Persistence.MongoDb;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AppQuiz.Application.Quizzes.Queries.GetById
 {

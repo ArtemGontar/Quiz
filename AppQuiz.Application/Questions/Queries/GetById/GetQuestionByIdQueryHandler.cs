@@ -1,10 +1,10 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using AppQuiz.Application.Questions.Specifications;
+﻿using AppQuiz.Application.Questions.Specifications;
 using AppQuiz.Domain;
-using AppQuiz.Persistence.Abstractions;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Shared.Persistence.MongoDb;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AppQuiz.Application.Questions.Queries.GetById
 {
@@ -21,8 +21,7 @@ namespace AppQuiz.Application.Questions.Queries.GetById
         public async Task<Question> Handle(GetQuestionByIdQuery request, CancellationToken cancellationToken)
         {
             var questionSpecification = new QuestionByIdSpecification(request.QuestionId);
-            var question = await _questionRepository.GetAsync(questionSpecification);
-            return question;
+            return await _questionRepository.GetAsync(questionSpecification);
         }
     }
 }

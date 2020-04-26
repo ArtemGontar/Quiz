@@ -1,4 +1,10 @@
-﻿using MediatR;
+﻿using AppQuiz.Application.Quizzes.Commands.Create;
+using AppQuiz.Application.Quizzes.Commands.Delete;
+using AppQuiz.Application.Quizzes.Commands.Update;
+using AppQuiz.Application.Quizzes.Queries.GetAll;
+using AppQuiz.Application.Quizzes.Queries.GetById;
+using AppQuiz.Domain;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
@@ -6,12 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using AppQuiz.Application.Quizzes.Commands.Create;
-using AppQuiz.Application.Quizzes.Commands.Delete;
-using AppQuiz.Application.Quizzes.Commands.Update;
-using AppQuiz.Application.Quizzes.Queries.GetAll;
-using AppQuiz.Application.Quizzes.Queries.GetById;
-using AppQuiz.Domain;
 
 namespace AppQuiz.Api.Controllers
 {
@@ -41,7 +41,7 @@ namespace AppQuiz.Api.Controllers
         [HttpGet]
         [Route("{quizId:guid}")]
         [SwaggerOperation("Get quiz by ID.")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(Question))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(Quiz))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Quiz was not found.")]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Get([FromQuery] GetQuizByIdQuery query)

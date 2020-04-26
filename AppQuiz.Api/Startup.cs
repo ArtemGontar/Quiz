@@ -1,20 +1,16 @@
-using AppQuiz.Api.Filters;
 using AppQuiz.Application.Infrastructure;
 using AppQuiz.Application.Quizzes.Queries.GetById;
 using AppQuiz.Domain;
 using AppQuiz.Persistence;
-using AppQuiz.Persistence.Abstractions;
 using AutoMapper;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
+using Shared.Persistence.MongoDb;
 
 namespace AppQuiz.Api
 {
@@ -30,11 +26,12 @@ namespace AppQuiz.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddSingleton<QuizDbContext>();
-            //services.AddScoped<IRepository<Quiz>, QuizRepository>();
-            //services.AddScoped<IRepository<Question>, QuestionRepository>();
-            //services.AddAutoMapper(typeof(QuizProfile).Assembly);
-            //services.AddMediatR(typeof(GetQuizByIdQueryHandler).Assembly);
+            services.AddSingleton<QuizDbContext>();
+            services.AddScoped<IRepository<Chapter>, ChapterRepository>();
+            services.AddScoped<IRepository<Quiz>, QuizRepository>();
+            services.AddScoped<IRepository<Question>, QuestionRepository>();
+            services.AddAutoMapper(typeof(QuizProfile).Assembly);
+            services.AddMediatR(typeof(GetQuizByIdQueryHandler).Assembly);
 
             var identityUrl = Configuration["IdentityUrl"];
 
@@ -47,7 +44,7 @@ namespace AppQuiz.Api
                 .AddOpenIdConnect("oidc", options =>
                 {
                     options.ClientId = "my_client_id";
-                    options.ClientSecret = "my_client_id_secret";
+                    options.ClientSecret = "my_client_secret";
                     options.SaveTokens = true;
                     options.RequireHttpsMetadata = false;
                     options.Authority = identityUrl;
@@ -56,32 +53,32 @@ namespace AppQuiz.Api
             
             //services.AddAuthorization();
 
-            //services.AddSwaggerGen(c =>
-            //{
-            //    c.SwaggerDoc("v1", new OpenApiInfo()
-            //    {
-            //        Title = "You api title",
-            //        Version = "v1"
-            //    });
-            //    c.OperationFilter<AuthorizeCheckOperationFilter>();
-            //    c.AddSecurityDefinition("oauth2",
-            //        new OpenApiSecurityScheme()
-            //        {
-            //            Type = SecuritySchemeType.OAuth2,
-            //            Flows = new OpenApiOAuthFlows()
-            //            {
-            //                Implicit = new OpenApiOAuthFlow()
-            //                {
-            //                    AuthorizationUrl = new Uri($"{identityUrl}/connect/authorize"),
-            //                    TokenUrl = new Uri($"{identityUrl}/connect/token"),
-            //                    Scopes = new Dictionary<string, string>
-            //                    {
-            //                        {"QuizApi", "Quiz API - full access"}
-            //                    },
-            //                }
-            //            }
-            //        });
-            //});
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo()
+                {
+                    Title = "You api title",
+                    Version = "v1"
+                });
+                //c.OperationFilter<AuthorizeCheckOperationFilter>();
+                //c.AddSecurityDefinition("oauth2",
+                //    new OpenApiSecurityScheme()
+                //    {
+                //        Type = SecuritySchemeType.OAuth2,
+                //        Flows = new OpenApiOAuthFlows()
+                //        {
+                //            Implicit = new OpenApiOAuthFlow()
+                //            {
+                //                AuthorizationUrl = new Uri($"{identityUrl}/connect/authorize"),
+                //                TokenUrl = new Uri($"{identityUrl}/connect/token"),
+                //                Scopes = new Dictionary<string, string>
+                //                {
+                //                    {"QuizApi", "Quiz API - full access"}
+                //                },
+                //            }
+                //        }
+                //    });
+            });
 
             services.AddControllersWithViews();
         }
@@ -94,23 +91,15 @@ namespace AppQuiz.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseHttpsRedirection();
-
             app.UseRouting();
-            //app.UseCors(builder => builder
-            //    .SetIsOriginAllowed((host) => true)
-            //    .AllowAnyMethod()
-            //    .AllowAnyHeader()
-            //    .AllowCredentials()
-            //    .WithExposedHeaders("Content-Disposition"));
 
-            //app.UseSwagger();
-            //app.UseSwaggerUI(c =>
-            //{
-            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz API V1");
-            //    c.OAuthClientId("SwaggerId");
-            //    c.OAuthAppName("Swagger UI");
-            //});
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz API V1");
+                c.OAuthClientId("SwaggerId");
+                c.OAuthAppName("Swagger UI");
+            });
 
             app.UseAuthentication();
             
@@ -120,24 +109,6 @@ namespace AppQuiz.Api
             {
                 endpoints.MapDefaultControllerRoute();
             });
-        }
-
-        protected virtual void ConfigureServicesAuth(IServiceCollection services)
-        {
-            var identityUrl = Configuration["IdentityUrl"];
-
-
-            services.AddAuthentication("Bearer")
-                .AddOAuth("Bearer", options =>
-                {
-                    options.AuthorizationEndpoint = identityUrl;
-                    options.ClientId = "QuizApi";
-
-                })
-                .AddCookie();
-
-            services.AddAuthorization();
-
         }
     }
 }

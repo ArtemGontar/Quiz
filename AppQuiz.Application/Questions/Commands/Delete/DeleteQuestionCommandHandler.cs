@@ -1,8 +1,8 @@
 ﻿using AppQuiz.Application.Questions.Specifications;
 using AppQuiz.Domain;
-using AppQuiz.Persistence.Abstractions;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Shared.Persistence.MongoDb;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +18,7 @@ namespace AppQuiz.Application.Questions.Commands.Delete
             _questionRepository = questionRepository;
             _logger = logger;
         }
+
         public async Task<bool> Handle(DeleteQuestionCommand request, CancellationToken cancellationToken)
         {
             var questionSpecification = new QuestionByIdSpecification(request.QuestionId);

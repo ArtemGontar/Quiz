@@ -7,14 +7,14 @@ namespace AppQuiz.Application.Questions.Commands.Delete
     {
         internal Guid QuestionId { get; set; }
 
-        public DeleteQuestionCommand(Guid quizId)
+        public DeleteQuestionCommand(Guid questionId)
         {
-            if (quizId == Guid.Empty)
+            if (questionId == Guid.Empty)
             {
-                throw new ArgumentNullException(nameof(quizId));
+                throw new ArgumentNullException(nameof(questionId));
             }
 
-            QuestionId = quizId;
+            QuestionId = questionId;
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using AppQuiz.Domain;
-using AppQuiz.Persistence.Abstractions;
+﻿using AppQuiz.Domain;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Shared.Persistence.MongoDb;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AppQuiz.Application.Questions.Queries.GetAll
 {

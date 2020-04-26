@@ -1,23 +1,21 @@
-﻿using AppQuiz.Application.Questions.Queries.GetAll;
+﻿using AppQuiz.Application.Questions.Commands.Create;
+using AppQuiz.Application.Questions.Commands.Delete;
+using AppQuiz.Application.Questions.Commands.Update;
+using AppQuiz.Application.Questions.Queries.GetAll;
 using AppQuiz.Application.Questions.Queries.GetById;
+using AppQuiz.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using AppQuiz.Application.Questions.Commands.Create;
-using AppQuiz.Application.Questions.Commands.Delete;
-using AppQuiz.Application.Questions.Commands.Update;
-using AppQuiz.Domain;
-using Microsoft.AspNetCore.Authorization;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace AppQuiz.Api.Controllers
 {
     [ApiController]
-    [Authorize]
     [Route("questions")]
     public class QuestionsController : Controller
     {
@@ -33,6 +31,7 @@ namespace AppQuiz.Api.Controllers
         [HttpGet]
         [SwaggerOperation("Get all questions")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(IEnumerable<Question>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> GetAll()
         {
             var response = await _mediator.Send(new GetAllQuestionQuery());

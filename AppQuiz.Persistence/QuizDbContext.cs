@@ -1,7 +1,7 @@
 ﻿using System;
 using AppQuiz.Domain;
-using AppQuiz.Persistence.Abstractions;
 using Microsoft.Extensions.Options;
+using Shared.Persistence.MongoDb;
 
 namespace AppQuiz.Persistence
 {
@@ -15,6 +15,7 @@ namespace AppQuiz.Persistence
         {
             RegisterClassMap<Quiz, Guid>(d => d.Id);
             RegisterClassMap<Question, Guid>(d => d.Id);
+            RegisterClassMap<Chapter, Guid>(d => d.Id);
         }
     }
 }

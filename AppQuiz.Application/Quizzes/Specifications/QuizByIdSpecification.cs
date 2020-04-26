@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AppQuiz.Domain;
+using Shared.Persistence.MongoDb;
+using System;
 using System.Linq.Expressions;
-using System.Text;
-using AppQuiz.Domain;
-using AppQuiz.Persistence.Abstractions;
 
 namespace AppQuiz.Application.Quizzes.Specifications
 {

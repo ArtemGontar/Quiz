@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AppQuiz.Domain;
-using AppQuiz.Persistence.Abstractions;
 using MongoDB.Driver;
+using Shared.Persistence.MongoDb;
 
 namespace AppQuiz.Persistence
 {

@@ -1,9 +1,9 @@
 ﻿using AppQuiz.Domain;
 using AppQuiz.Persistence;
-using AppQuiz.Persistence.Abstractions;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Moq;
+using Shared.Persistence.MongoDb;
 using Xunit;
 
 namespace AppQuiz.UnitTests.RepositoryTests
