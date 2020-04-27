@@ -6,6 +6,8 @@ using AppQuiz.Application.Chapters.Specifications;
 using AppQuiz.Domain;
 using Microsoft.Extensions.Logging;
 using Shared.Persistence.MongoDb;
+using MassTransit;
+using Shared.Bus.Messages;
 
 namespace AppQuiz.Application.Chapters.Commands.Delete
 {
@@ -13,16 +15,22 @@ namespace AppQuiz.Application.Chapters.Commands.Delete
     {
         private readonly ILogger<DeleteChapterCommandHandler> _logger;
         private readonly IRepository<Chapter> _chapterRepository;
+        private readonly ISendEndpointProvider sendEndpointProvider;
         public DeleteChapterCommandHandler(ILogger<DeleteChapterCommandHandler> logger, 
-            IRepository<Chapter> chapterRepository)
+            IRepository<Chapter> chapterRepository, ISendEndpointProvider sendEndpointProvider)
         {
             _logger = logger;
             _chapterRepository = chapterRepository;
+            this.sendEndpointProvider = sendEndpointProvider;
         }
 
         public async Task<bool> Handle(DeleteChapterCommand request, CancellationToken cancellationToken)
         {
             var chapterSpecification = new ChapterByIdSpecification(request.ChapterId);
+            
+            var endpoint = await sendEndpointProvider.GetSendEndpoint(new Uri("queue:delete-chapter"));
+
+            await endpoint.Send(new DeleteChapterMessage());
             return await _chapterRepository.DeleteAsync(chapterSpecification);
         }
     }

@@ -1,3 +1,5 @@
+using System;
+using MassTransit;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -7,7 +9,9 @@ namespace AppQuiz.Api
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -17,4 +21,5 @@ namespace AppQuiz.Api
                     webBuilder.UseStartup<Startup>();
                 });
     }
+
 }

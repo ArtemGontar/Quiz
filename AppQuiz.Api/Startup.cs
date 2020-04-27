@@ -1,13 +1,18 @@
+using System;
 using AppQuiz.Application.Infrastructure;
 using AppQuiz.Application.Quizzes.Queries.GetById;
 using AppQuiz.Domain;
 using AppQuiz.Persistence;
 using AutoMapper;
+using GreenPipes;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Shared.Persistence.MongoDb;
@@ -26,12 +31,38 @@ namespace AppQuiz.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ConnectionStrings>(Configuration.GetSection(ConnectionStrings.SECTION_NAME));
+            services.Configure<HealthCheckPublisherOptions>(options =>
+            {
+                options.Delay = TimeSpan.FromSeconds(2);
+                options.Predicate = (check) => check.Tags.Contains("ready");
+            });
+
             services.AddSingleton<QuizDbContext>();
             services.AddScoped<IRepository<Chapter>, ChapterRepository>();
             services.AddScoped<IRepository<Quiz>, QuizRepository>();
             services.AddScoped<IRepository<Question>, QuestionRepository>();
+            
             services.AddAutoMapper(typeof(QuizProfile).Assembly);
             services.AddMediatR(typeof(GetQuizByIdQueryHandler).Assembly);
+            services.AddMassTransit(x =>
+            {
+
+                x.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
+                {
+                    // configure health checks for this bus instance
+                    cfg.UseHealthCheck(provider);
+
+                    cfg.Host("rabbitmq://localhost");
+
+                    cfg.ReceiveEndpoint("delete-chapter", ep =>
+                    {
+                        ep.PrefetchCount = 16;
+                        ep.UseMessageRetry(r => r.Interval(2, 100));
+                    });
+                }));
+            });
+            services.AddMassTransitHostedService();
 
             var identityUrl = Configuration["IdentityUrl"];
 
@@ -50,7 +81,8 @@ namespace AppQuiz.Api
                     options.Authority = identityUrl;
                     options.ResponseType = "code";
                 });
-            
+
+
             //services.AddAuthorization();
 
             services.AddSwaggerGen(c =>
@@ -108,6 +140,18 @@ namespace AppQuiz.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
+
+                // The readiness check uses all registered checks with the 'ready' tag.
+                endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions()
+                {
+                    Predicate = (check) => check.Tags.Contains("ready"),
+                });
+
+                endpoints.MapHealthChecks("/health/live", new HealthCheckOptions()
+                {
+                    // Exclude all checks and return a 200-Ok.
+                    Predicate = (_) => false
+                });
             });
         }
     }
