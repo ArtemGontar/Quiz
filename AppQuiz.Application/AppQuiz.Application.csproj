@@ -9,7 +9,6 @@
     <PackageReference Include="MassTransit" Version="6.2.5" />
     <PackageReference Include="MediatR" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.2" />
-    <PackageReference Include="Shared.Bus.Messages" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,17 +16,13 @@
     <ProjectReference Include="..\AppQuiz.Persistence\AppQuiz.Persistence.csproj" />
   </ItemGroup>
 
+  
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <PackageReference Include="Shared.Bus.Messages" Version="1.0.0" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <ProjectReference Include="..\..\Shared\Shared.Identity\Shared.Identity.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(Configuration)' == 'Release'">
-    <ProjectReference Include="Shared.Bus.Messages" Version="1.0.0" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <Folder Include="Consumers\" />
   </ItemGroup>
 
 </Project>

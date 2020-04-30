@@ -5,6 +5,7 @@ using AppQuiz.Domain;
 using AppQuiz.Persistence;
 using AutoMapper;
 using GreenPipes;
+using HealthChecks.UI.Client;
 using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -62,6 +63,11 @@ namespace AppQuiz.Api
                     });
                 }));
             });
+
+            services.AddHealthChecks()
+                .AddCheck("self", () => HealthCheckResult.Healthy())
+                .AddMongoDb(Configuration.GetSection(ConnectionStrings.SECTION_NAME).Get<ConnectionStrings>().Mongo);
+
             services.AddMassTransitHostedService();
 
             var identityUrl = Configuration["IdentityUrl"];
@@ -140,6 +146,22 @@ namespace AppQuiz.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
+
+                endpoints.MapHealthChecks("/hc", new HealthCheckOptions
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+
+                endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
+                {
+                    Predicate = r => r.Name.Contains("self")
+                });
+
+                endpoints.MapHealthChecks("/readiness", new HealthCheckOptions
+                {
+                    Predicate = r => !r.Name.Contains("self")
+                });
 
                 // The readiness check uses all registered checks with the 'ready' tag.
                 endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions()
