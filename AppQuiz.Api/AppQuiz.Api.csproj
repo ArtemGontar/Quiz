@@ -28,5 +28,4 @@
     <ProjectReference Include="..\AppQuiz.Domain\AppQuiz.Domain.csproj" />
   </ItemGroup>
 
-
 </Project>

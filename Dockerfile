@@ -7,8 +7,6 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["AppQuiz.Api/AppQuiz.Api.csproj", "AppQuiz.Api/"]
-RUN dotnet restore "AppQuiz.Api/AppQuiz.Api.csproj"
 COPY . .
 WORKDIR "/src/AppQuiz.Api"
 RUN dotnet build "AppQuiz.Api.csproj" -c Release -o /app/build
