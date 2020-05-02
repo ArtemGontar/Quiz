@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Shared.Bus.Messages\Shared.Bus.Messages.csproj" />
     <ProjectReference Include="..\AppQuiz.Domain\AppQuiz.Domain.csproj" />
     <ProjectReference Include="..\AppQuiz.Persistence\AppQuiz.Persistence.csproj" />
   </ItemGroup>
@@ -19,10 +20,6 @@
   
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <PackageReference Include="Shared.Bus.Messages" Version="1.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\..\Shared\Shared.Identity\Shared.Identity.csproj" />
   </ItemGroup>
 
 </Project>

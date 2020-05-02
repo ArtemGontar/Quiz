@@ -12,11 +12,13 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using AppQuiz.Application.Questions.Queries.GetByQuizId;
+using AppQuiz.Application.Quizzes.Commands.Result;
 
 namespace AppQuiz.Api.Controllers
 {
     [ApiController]
-    [Route("quizzes")]
+    [Route("api/quizzes")]
     public class QuizzesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -56,6 +58,20 @@ namespace AppQuiz.Api.Controllers
             return Ok(response);
         }
 
+        [HttpGet]
+        [Route("{quizId:guid}/questions")]
+        [SwaggerOperation("Get questions by quizId")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(IEnumerable<Quiz>))]
+        public async Task<IActionResult> GetQuestionsByQuizId([FromRoute] Guid quizId)
+        {
+            var response = await _mediator.Send(new GetQuestionsByQuizIdQuery()
+            {
+                QuizId = quizId
+            });
+            //catch if failure
+            return Ok(response);
+        }
+
         [HttpPost]
         [SwaggerOperation("Create quiz")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(Guid))]
@@ -90,6 +106,21 @@ namespace AppQuiz.Api.Controllers
         public async Task<IActionResult> Delete([FromRoute] Guid quizId)
         {
             var response = await _mediator.Send(new DeleteQuizCommand(quizId));
+            //catch if failure
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("{quizId:guid}/result")]
+        [SwaggerOperation("Create quiz")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(Guid))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
+        public async Task<IActionResult> PostResult([FromRoute] Guid quizId, [FromBody] IEnumerable<string> answers)
+        {
+            var response = await _mediator.Send(new ResultQuizCommand(quizId)
+            {
+                Answers = answers
+            });
             //catch if failure
             return Ok(response);
         }

@@ -12,11 +12,13 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using AppQuiz.Application.Quizzes.Queries.GetAll;
+using AppQuiz.Application.Quizzes.Queries.GetByChapterId;
 
 namespace AppQuiz.Api.Controllers
 {
     [ApiController]
-    [Route("chapters")]
+    [Route("api/chapters")]
     public class ChaptersController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -45,14 +47,31 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(Chapter))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Chapter was not found.")]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
-        public async Task<IActionResult> Get([FromQuery] GetChapterByIdQuery query)
+        public async Task<IActionResult> Get([FromRoute] Guid chapterId)
         {
-            var response = await _mediator.Send(query);
+            var response = await _mediator.Send(new GetChapterByIdQuery()
+            {
+                ChapterId = chapterId
+            });
             if (response == null)
             {
-                return NotFound($"Chapter with ID '{query.ChapterId}' was not found.");
+                return NotFound($"Chapter with ID '{chapterId}' was not found.");
             }
 
+            //catch if failure
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{chapterId:guid}/quizzes")]
+        [SwaggerOperation("Get quizzes by chapterId")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(IEnumerable<Quiz>))]
+        public async Task<IActionResult> GetQuizzesByChapterId([FromRoute] Guid chapterId)
+        {
+            var response = await _mediator.Send(new GetQuizzesByChapterIdQuery()
+            {
+                ChapterId = chapterId
+            });
             //catch if failure
             return Ok(response);
         }

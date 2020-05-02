@@ -5,6 +5,8 @@ using Shared.Persistence.MongoDb;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using AppQuiz.Application.Chapters.Specifications;
+using AutoMapper;
 
 namespace AppQuiz.Application.Quizzes.Commands.Create
 {
@@ -12,21 +14,28 @@ namespace AppQuiz.Application.Quizzes.Commands.Create
     {
         private readonly ILogger<CreateQuizCommandHandler> _logger;
         private readonly IRepository<Quiz> _quizRepository;
+        private readonly IRepository<Chapter> _chapterRepository;
+        private readonly IMapper _mapper;
         public CreateQuizCommandHandler(IRepository<Quiz> quizRepository,
-            ILogger<CreateQuizCommandHandler> logger)
+            ILogger<CreateQuizCommandHandler> logger, 
+            IRepository<Chapter> chapterRepository,
+            IMapper mapper)
         {
             _quizRepository = quizRepository;
             _logger = logger;
+            _chapterRepository = chapterRepository;
+            _mapper = mapper;
         }
 
         public async Task<Guid> Handle(CreateQuizCommand request, CancellationToken cancellationToken)
         {
-            var quiz = new Quiz
+            if (!await _chapterRepository.AnyAsync(new ChapterByIdSpecification(request.ChapterId)))
             {
-                Title = request.Title,
-                OwnerId = request.OwnerId
-            };
+                throw new InvalidOperationException();
+            }
 
+            var quiz = _mapper.Map<Quiz>(request);
+            
             if (!await _quizRepository.SaveAsync(quiz))
             {
                 _logger.LogError("Quiz save failed");

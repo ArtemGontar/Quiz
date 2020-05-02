@@ -1,6 +1,7 @@
 using System;
 using AppQuiz.Application.Infrastructure;
 using AppQuiz.Application.Quizzes.Queries.GetById;
+using AppQuiz.Application.Services;
 using AppQuiz.Domain;
 using AppQuiz.Persistence;
 using AutoMapper;
@@ -43,7 +44,9 @@ namespace AppQuiz.Api
             services.AddScoped<IRepository<Chapter>, ChapterRepository>();
             services.AddScoped<IRepository<Quiz>, QuizRepository>();
             services.AddScoped<IRepository<Question>, QuestionRepository>();
-            
+
+            services.AddScoped<ICheckResultService, CheckResultsService>();
+
             services.AddAutoMapper(typeof(QuizProfile).Assembly);
             services.AddMediatR(typeof(GetQuizByIdQueryHandler).Assembly);
             services.AddMassTransit(x =>
@@ -118,6 +121,8 @@ namespace AppQuiz.Api
                 //    });
             });
 
+            services.AddCors();
+
             services.AddControllersWithViews();
         }
 
@@ -130,7 +135,11 @@ namespace AppQuiz.Api
             }
 
             app.UseRouting();
+            //app.UseHttpsRedirection();
 
+            app.UseCors(builder =>
+                builder.WithOrigins("http://localhost:4200").AllowAnyHeader());
+            
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

@@ -28,9 +28,13 @@ namespace AppQuiz.Application.Chapters.Commands.Delete
         {
             var chapterSpecification = new ChapterByIdSpecification(request.ChapterId);
             
-            var endpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:delete-chapter"));
-
-            await endpoint.Send(new DeleteChapterMessage());
+            
+            var message = new DeleteChapterMessage()
+            {
+                ChapterId = request.ChapterId
+            };
+            var endpoint = await _sendEndpointProvider.GetSendEndpoint(message.GetReceiveEndpoint());
+            await endpoint.Send(message, cancellationToken);
             return await _chapterRepository.DeleteAsync(chapterSpecification);
         }
     }

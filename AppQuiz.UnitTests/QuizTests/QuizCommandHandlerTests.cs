@@ -32,9 +32,9 @@ namespace AppQuiz.UnitTests.QuizTests
             _quizRepository = _autoMocker.GetMock<IRepository<Quiz>>();
             _quizRepository.Setup(x => x.SaveAsync(It.IsAny<Quiz>()))
                 .ReturnsAsync(true);
-            var createQuizCommand = new CreateQuizCommand(Guid.NewGuid())
+            var createQuizCommand = new CreateQuizCommand
             {
-                Title = "anonymousTitle",
+                Title = "anonymousTitle"
             };
             
 
