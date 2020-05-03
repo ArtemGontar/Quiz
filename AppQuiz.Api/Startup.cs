@@ -67,30 +67,18 @@ namespace AppQuiz.Api
                 }));
             });
 
+            services.AddMassTransitHostedService();
+            
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())
                 .AddMongoDb(Configuration.GetSection(ConnectionStrings.SECTION_NAME).Get<ConnectionStrings>().Mongo);
 
-            services.AddMassTransitHostedService();
+            services.AddCors(options =>
+                options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()));
 
             var identityUrl = Configuration["IdentityUrl"];
-
-            services.AddAuthentication(config =>
-                {
-                    config.DefaultScheme = "Cookie";
-                    config.DefaultChallengeScheme = "oidc";
-                })
-                .AddCookie("Cookie")
-                .AddOpenIdConnect("oidc", options =>
-                {
-                    options.ClientId = "my_client_id";
-                    options.ClientSecret = "my_client_secret";
-                    options.SaveTokens = true;
-                    options.RequireHttpsMetadata = false;
-                    options.Authority = identityUrl;
-                    options.ResponseType = "code";
-                });
-
 
             //services.AddAuthorization();
 
@@ -121,8 +109,6 @@ namespace AppQuiz.Api
                 //    });
             });
 
-            services.AddCors();
-
             services.AddControllersWithViews();
         }
 
@@ -137,8 +123,7 @@ namespace AppQuiz.Api
             app.UseRouting();
             //app.UseHttpsRedirection();
 
-            app.UseCors(builder =>
-                builder.WithOrigins("http://localhost:4200").AllowAnyHeader());
+            app.UseCors("AllowAll");
             
             app.UseSwagger();
             app.UseSwaggerUI(c =>
