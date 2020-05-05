@@ -79,13 +79,22 @@ namespace AppQuiz.Api.Controllers
         [HttpPost]
         [SwaggerOperation("Create chapter")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(Guid))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Create chapter failed")]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Post([FromBody] CreateChapterCommand
             createChapterCommand)
         {
-            var response = await _mediator.Send(createChapterCommand);
+            try
+            {
+                var response = await _mediator.Send(createChapterCommand); 
+                return Ok(response);
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e);
+            }
             //catch if failure
-            return Ok(response);
+            
         }
 
         [HttpPut]

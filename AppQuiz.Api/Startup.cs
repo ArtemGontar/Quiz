@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Shared.Bus.Messages;
 using Shared.Persistence.MongoDb;
 
 namespace AppQuiz.Api
@@ -51,7 +52,8 @@ namespace AppQuiz.Api
             services.AddMediatR(typeof(GetQuizByIdQueryHandler).Assembly);
             services.AddMassTransit(x =>
             {
-
+                EndpointConvention.Map<DeleteChapterMessage>(typeof(DeleteChapterMessage).GetReceiveEndpoint());
+                EndpointConvention.Map<QuizResultMessage>(typeof(QuizResultMessage).GetReceiveEndpoint());
                 x.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
                 {
                     // configure health checks for this bus instance

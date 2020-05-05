@@ -25,7 +25,7 @@ namespace AppQuiz.Persistence
                 entity.Id = Guid.NewGuid();
 
             var update = Update
-                .Set(x => x.Name, entity.Name)
+                .Set(x => x.Title, entity.Title)
                 .Set(x => x.ChapterId, entity.ChapterId)
                 .Set(x => x.Priority, entity.Priority)
                 .Set(x => x.OwnerId, entity.OwnerId);

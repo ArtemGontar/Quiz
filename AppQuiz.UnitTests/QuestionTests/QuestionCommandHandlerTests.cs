@@ -35,13 +35,14 @@ namespace AppQuiz.UnitTests.QuestionTests
             var createQuestionCommand = new CreateQuestionCommand()
             {
                 QuizId = Guid.NewGuid(),
-                Text = "anonymousText",
+                Title = "anonymousText",
                 CorrectAnswer = "anonymousText",
-                Options = new List<string>()
+                Options = new List<Option>()
                 {
-                    "anonymousOption1",
-                    "anonymousOption2",
-                    "anonymousOption3",
+                    new Option(){Value = "anonymousOption1"},
+                    new Option(){Value = "anonymousOption2"},
+                    new Option(){Value = "anonymousOption3"},
+                    new Option(){Value = "anonymousOption4"},
                 }
             };
 
@@ -49,7 +50,7 @@ namespace AppQuiz.UnitTests.QuestionTests
             var result = await createQuestionCommandHandler.Handle(createQuestionCommand, CancellationToken.None);
 
             //Assert
-            Assert.NotEqual(Guid.NewGuid(), result);
+            Assert.NotEqual(Guid.Empty, result);
         }
 
         [Fact]
@@ -78,7 +79,7 @@ namespace AppQuiz.UnitTests.QuestionTests
             var result = await updateQuestionCommandHandler.Handle(updateQuestionCommand, CancellationToken.None);
 
             //Assert
-            Assert.NotEqual(Guid.NewGuid(), result);
+            Assert.NotEqual(Guid.Empty, result);
         }
 
         [Fact]

@@ -6,6 +6,7 @@ using AppQuiz.Domain;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Shared.Persistence.MongoDb;
+using AppQuiz.Application.Chapters.Specifications;
 
 namespace AppQuiz.Application.Chapters.Commands.Update
 {
@@ -25,12 +26,18 @@ namespace AppQuiz.Application.Chapters.Commands.Update
 
         public async Task<Guid> Handle(UpdateChapterCommand request, CancellationToken cancellationToken)
         {
+            if(!await _chapterRepository.AnyAsync(new ChapterByIdSpecification(request.Id)))
+            {
+                _logger.LogError($"Chapter with id {request.Id} not found");
+                throw new InvalidOperationException($"Chapter with id {request.Id} not found");
+            }
+
             var chapter = _mapper.Map<Chapter>(request);
 
             if (!await _chapterRepository.SaveAsync(chapter))
             {
-                _logger.LogError("Chapter save failed");
-                throw new InvalidOperationException("Chapter save failed");
+                _logger.LogError("Update chapter failed");
+                throw new InvalidOperationException("Update chapter failed");
             }
 
             return chapter.Id;

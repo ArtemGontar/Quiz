@@ -28,8 +28,8 @@ namespace AppQuiz.Application.Chapters.Commands.Create
 
             if (!await _chapterRepository.SaveAsync(chapter))
             {
-                _logger.LogError("Chapter save failed");
-                throw new InvalidOperationException("Chapter save failed");
+                _logger.LogError("Create chapter failed");
+                throw new InvalidOperationException("Create chapter failed");
             }
 
             return chapter.Id;

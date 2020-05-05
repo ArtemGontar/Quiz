@@ -30,14 +30,16 @@ namespace AppQuiz.Application.Questions.Commands.Create
         {
             if (!await _quizRepository.AnyAsync(new QuizByIdSpecification(request.QuizId)))
             {
-                throw new InvalidOperationException();
+                _logger.LogError($"Quiz with id {request.QuizId} was not found");
+                throw new InvalidOperationException($"Quiz with id {request.QuizId} was not found");
             }
+
             var question = _mapper.Map<Question>(request);
 
             if (!await _questionRepository.SaveAsync(question))
             {
-                _logger.LogError("Question save failed");
-                throw new InvalidOperationException("Question save failed");
+                _logger.LogError("Create question failed");
+                throw new InvalidOperationException("Create question failed");
             }
 
             return question.Id;
