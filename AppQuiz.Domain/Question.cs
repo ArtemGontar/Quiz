@@ -6,9 +6,9 @@ namespace AppQuiz.Domain
     public class Question
     {
         public Guid Id { get; set; }
-        public string Text { get; set; }
+        public string Title { get; set; }
         public string CorrectAnswer { get; set; }
-        public ICollection<string> Options { get; set; } = new List<string>();
+        public ICollection<Option> Options { get; set; } = new List<Option>();
         public Guid QuizId { get; set; }
     }
 }

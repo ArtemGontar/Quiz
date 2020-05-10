@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace AppQuiz.Api.Controllers
 {
     [ApiController]
-    [Route("questions")]
+    [Route("api/questions")]
     public class QuestionsController : Controller
     {
         private readonly IMediator _mediator;
@@ -45,12 +45,15 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(Question))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Question was not found.")]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
-        public async Task<IActionResult> Get([FromQuery] GetQuestionByIdQuery query)
+        public async Task<IActionResult> Get([FromQuery] Guid questionId)
         {
-            var response = await _mediator.Send(query);
+            var response = await _mediator.Send(new GetQuestionByIdQuery()
+            {
+                QuestionId = questionId
+            });
             if (response == null)
             {
-                return NotFound($"Question with ID '{query.QuestionId}' was not found.");
+                return NotFound($"Question with ID '{questionId}' was not found.");
             }
 
             //catch if failure

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Threading.Tasks;
-using AppQuiz.Domain;
+﻿using AppQuiz.Domain;
 using MongoDB.Driver;
 using Shared.Persistence.MongoDb;
+using System;
+using System.Threading.Tasks;
 
 namespace AppQuiz.Persistence
 {
@@ -26,6 +23,7 @@ namespace AppQuiz.Persistence
 
             var update = Update
                 .Set(x => x.Name, entity.Name)
+                .Set(x => x.EnglishLevel, entity.EnglishLevel)
                 .Set(x => x.OwnerId, entity.OwnerId);
 
             var result = await Collection.UpdateOneAsync(FilterId(entity.Id), update, OptionUpsert);
