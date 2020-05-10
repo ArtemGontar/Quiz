@@ -1,24 +1,25 @@
 ﻿using AppQuiz.Application.Chapters.Commands.Create;
+using AppQuiz.Application.Infrastructure;
+using AppQuiz.Domain;
+using AutoMapper;
+using Moq;
 using Moq.AutoMock;
+using Shared.Common;
+using Shared.Persistence.MongoDb;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace AppQuiz.UnitTests.ChapterTests
 {
-    using AppQuiz.Application.Infrastructure;
-    using AppQuiz.Domain;
-    using AutoMapper;
-    using Moq;
-    using Shared.Common;
-    using Shared.Persistence.MongoDb;
-    using System.Threading;
-    using Xunit;
+
 
     public class CreateChapterCommandHandlerTests
     {
         private AutoMocker _autoMocker;
         private CreateChapterCommandHandler _chapterCommandHandler;
-        private Mock<IRepository<Chapter>> _chapterRepository;
+        private Mock<IRepository<Chapter>> _chapterRepositoryMock;
 
         public CreateChapterCommandHandlerTests()
         {
@@ -27,7 +28,7 @@ namespace AppQuiz.UnitTests.ChapterTests
             _autoMocker.Use<IMapper>(new MapperConfiguration(x => x.AddMaps(typeof(QuizProfile).Assembly)).CreateMapper());
             _chapterCommandHandler = _autoMocker.CreateInstance<CreateChapterCommandHandler>();
 
-            _chapterRepository = _autoMocker.GetMock<IRepository<Chapter>>();
+            _chapterRepositoryMock = _autoMocker.GetMock<IRepository<Chapter>>();
         }
 
         [Fact]
@@ -40,7 +41,7 @@ namespace AppQuiz.UnitTests.ChapterTests
                 EnglishLevel = EnglishLevel.Beginner
             };
 
-            _chapterRepository.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))
+            _chapterRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))
                 .Callback<Chapter>(x => x.Id = Guid.NewGuid())
                 .ReturnsAsync(true);
             //Act
@@ -62,7 +63,7 @@ namespace AppQuiz.UnitTests.ChapterTests
                 EnglishLevel = EnglishLevel.Beginner
             };
 
-            _chapterRepository.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))
+            _chapterRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))
                 .ReturnsAsync(false);
             
             //Act

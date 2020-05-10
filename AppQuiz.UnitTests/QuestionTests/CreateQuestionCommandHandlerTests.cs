@@ -7,7 +7,6 @@ using Moq.AutoMock;
 using Shared.Persistence.MongoDb;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -17,25 +16,25 @@ namespace AppQuiz.UnitTests.QuestionTests
     public class CreateQuestionCommandHandlerTests
     {
         private readonly AutoMocker _autoMocker;
-        private Mock<IRepository<Question>> _questionRepository;
-        private Mock<IRepository<Quiz>> _quizRepository;
+        private Mock<IRepository<Question>> _questionRepositoryMock;
+        private Mock<IRepository<Quiz>> _quizRepositoryMock;
         private CreateQuestionCommandHandler _questionCommandHandler;
         public CreateQuestionCommandHandlerTests()
         {
             _autoMocker = new AutoMocker();
             _autoMocker.Use<IMapper>(new MapperConfiguration(x => x.AddMaps(typeof(QuizProfile).Assembly)).CreateMapper());
             _questionCommandHandler = _autoMocker.CreateInstance<CreateQuestionCommandHandler>();
-            _questionRepository = _autoMocker.GetMock<IRepository<Question>>();
-            _quizRepository = _autoMocker.GetMock<IRepository<Quiz>>();
+            _questionRepositoryMock = _autoMocker.GetMock<IRepository<Question>>();
+            _quizRepositoryMock = _autoMocker.GetMock<IRepository<Quiz>>();
         }
 
         [Fact]
         public async Task Handler_ValidQuestionData_ShouldSuccess()
         {
             //Arrange
-            _quizRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
+            _quizRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
                 .ReturnsAsync(true);
-            _questionRepository.Setup(x => x.SaveAsync(It.IsAny<Question>()))
+            _questionRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Question>()))
                 .Callback<Question>(x => x.Id = Guid.NewGuid())
                 .ReturnsAsync(true);
 
@@ -65,7 +64,7 @@ namespace AppQuiz.UnitTests.QuestionTests
         public async Task Handle_QuizIdNotExist_ShouldNotFound()
         {
             //Arrange
-            _quizRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
+            _quizRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
                 .ReturnsAsync(false);
 
             var createQuestionCommand = new CreateQuestionCommand()
@@ -93,9 +92,9 @@ namespace AppQuiz.UnitTests.QuestionTests
         public async Task Handle_ValidQuestionData_SaveShouldFailed()
         {
             //Arrange
-            _quizRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
+            _quizRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
                 .ReturnsAsync(true);
-            _questionRepository.Setup(x => x.SaveAsync(It.IsAny<Question>()))
+            _questionRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Question>()))
                 .ReturnsAsync(false);
 
             var createQuestionCommand = new CreateQuestionCommand()
@@ -111,7 +110,6 @@ namespace AppQuiz.UnitTests.QuestionTests
                     new Option(){Value = "anonymousOption4"},
                 }
             };
-
 
             //Act
             //Assert

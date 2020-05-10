@@ -17,15 +17,14 @@ namespace AppQuiz.UnitTests.ChapterTests
     {
         private AutoMocker _autoMocker;
         private UpdateChapterCommandHandler _chapterCommandHandler;
-        private Mock<IRepository<Chapter>> _chapterRepository;
+        private Mock<IRepository<Chapter>> _chapterRepositoryMock;
         public UpdateChapterCommandHandlerTests()
         {
             _autoMocker = new AutoMocker();
 
             _autoMocker.Use<IMapper>(new MapperConfiguration(x => x.AddMaps(typeof(QuizProfile).Assembly)).CreateMapper());
             _chapterCommandHandler = _autoMocker.CreateInstance<UpdateChapterCommandHandler>();
-
-            _chapterRepository = _autoMocker.GetMock<IRepository<Chapter>>();
+            _chapterRepositoryMock = _autoMocker.GetMock<IRepository<Chapter>>();
         }
 
         [Fact]
@@ -40,9 +39,9 @@ namespace AppQuiz.UnitTests.ChapterTests
             };
             command.SetId(chapterId);
 
-            _chapterRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
+            _chapterRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
                 .ReturnsAsync(true);
-            _chapterRepository.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))
+            _chapterRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))
                 .ReturnsAsync(true);
             //Act
 
@@ -66,7 +65,7 @@ namespace AppQuiz.UnitTests.ChapterTests
             };
             command.SetId(chapterId);
 
-            _chapterRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
+            _chapterRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
                 .ReturnsAsync(false);
 
             //Act
@@ -87,9 +86,9 @@ namespace AppQuiz.UnitTests.ChapterTests
             };
             command.SetId(chapterId);
 
-            _chapterRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
+            _chapterRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
                 .ReturnsAsync(true);
-            _chapterRepository.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))
+            _chapterRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))
                 .ReturnsAsync(false);
 
             //Act

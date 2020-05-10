@@ -41,7 +41,7 @@ namespace AppQuiz.Application.Quizzes.Commands.Result
                 QuizId = request.QuizId
             }, cancellationToken);
 
-            var quizResults = _checkResultService.CheckResult(questions.ToList(), request.Answers.ToList());
+            var quizResults = _checkResultService.CheckResult(questions.Select(x => x.CorrectAnswer).ToList(), request.Answers.ToList());
 
             var message = _mapper.Map<QuizResultMessage>(quizResults);
             var endpoint = await _sendEndpointProvider.GetSendEndpoint(message.GetReceiveEndpoint());

@@ -1,5 +1,4 @@
 ﻿using AppQuiz.Application.Infrastructure;
-using AppQuiz.Application.Quizzes.Commands.Create;
 using AppQuiz.Application.Quizzes.Commands.Update;
 using AppQuiz.Domain;
 using AutoMapper;
@@ -10,7 +9,6 @@ using Shared.Common;
 using Shared.Persistence.MongoDb;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -21,18 +19,18 @@ namespace AppQuiz.UnitTests.QuizTests
     {
         private readonly AutoMocker _autoMocker;
         private UpdateQuizCommandHandler _quizCommandHandler;
-        private Mock<IRepository<Quiz>> _quizRepository;
-        private Mock<IRepository<Chapter>> _chapterRepository;
-        private Mock<IMediator> _mediator;
+        private Mock<IRepository<Quiz>> _quizRepositoryMock;
+        private Mock<IRepository<Chapter>> _chapterRepositoryMock;
+        private Mock<IMediator> _mediatorMock;
 
         public UpdateQuizCommandHandlerTests()
         {
             _autoMocker = new AutoMocker();
             _autoMocker.Use<IMapper>(new MapperConfiguration(x => x.AddMaps(typeof(QuizProfile).Assembly)).CreateMapper());
             _quizCommandHandler = _autoMocker.CreateInstance<UpdateQuizCommandHandler>();
-            _quizRepository = _autoMocker.GetMock<IRepository<Quiz>>();
-            _chapterRepository = _autoMocker.GetMock<IRepository<Chapter>>();
-            _mediator = _autoMocker.GetMock<IMediator>();
+            _quizRepositoryMock = _autoMocker.GetMock<IRepository<Quiz>>();
+            _chapterRepositoryMock = _autoMocker.GetMock<IRepository<Chapter>>();
+            _mediatorMock = _autoMocker.GetMock<IMediator>();
         }
 
         [Fact]
@@ -40,14 +38,14 @@ namespace AppQuiz.UnitTests.QuizTests
         {
             //Arrange
             var quizId = Guid.NewGuid();
-            _chapterRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
+            _chapterRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
                .ReturnsAsync(true);
-            _quizRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
+            _quizRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
                .ReturnsAsync(true);
-            _quizRepository.Setup(x => x.SaveAsync(It.IsAny<Quiz>()))
+            _quizRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Quiz>()))
                 .Callback<Quiz>(x => x.Id = quizId)
                 .ReturnsAsync(true);
-            _mediator.Setup(x => x.Send(It.IsAny<UpdateQuizCommandHandler>(), It.IsAny<CancellationToken>()));
+            _mediatorMock.Setup(x => x.Send(It.IsAny<UpdateQuizCommandHandler>(), It.IsAny<CancellationToken>()));
 
             var command = new UpdateQuizCommand
             {
@@ -83,7 +81,7 @@ namespace AppQuiz.UnitTests.QuizTests
         {
 
             //Arrange
-            _chapterRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
+            _chapterRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
                .ReturnsAsync(false);
 
             var command = new UpdateQuizCommand
@@ -119,9 +117,9 @@ namespace AppQuiz.UnitTests.QuizTests
         {
 
             //Arrange
-            _chapterRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
+            _chapterRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
                .ReturnsAsync(true);
-            _quizRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
+            _quizRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
                 .ReturnsAsync(false);
 
             var command = new UpdateQuizCommand
@@ -156,11 +154,11 @@ namespace AppQuiz.UnitTests.QuizTests
         public async Task Handle_ValidQuizData_SaveShouldFailed()
         {
             //Arrange
-            _chapterRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
+            _chapterRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Chapter>>()))
                .ReturnsAsync(true);
-            _quizRepository.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
+            _quizRepositoryMock.Setup(x => x.AnyAsync(It.IsAny<ISpecification<Quiz>>()))
                .ReturnsAsync(true);
-            _quizRepository.Setup(x => x.SaveAsync(It.IsAny<Quiz>()))
+            _quizRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Quiz>()))
                 .ReturnsAsync(false);
 
             var command = new UpdateQuizCommand

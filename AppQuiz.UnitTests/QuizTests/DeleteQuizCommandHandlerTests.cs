@@ -1,12 +1,10 @@
-﻿using AppQuiz.Application.Chapters.Commands.Delete;
-using AppQuiz.Application.Infrastructure;
+﻿using AppQuiz.Application.Infrastructure;
 using AppQuiz.Application.Quizzes.Commands.Delete;
 using AppQuiz.Domain;
 using AutoMapper;
 using MassTransit;
 using Moq;
 using Moq.AutoMock;
-using Shared.Bus.Messages;
 using Shared.Bus.Messages.Messages;
 using Shared.Persistence.MongoDb;
 using System;

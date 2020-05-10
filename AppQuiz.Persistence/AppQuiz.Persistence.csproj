@@ -8,14 +8,15 @@
     <PackageReference Include="MongoDB.Driver" Version="2.10.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Shared.Persistence.MongoDb\Shared.Persistence.MongoDb.csproj" />
-    <ProjectReference Include="..\AppQuiz.Domain\AppQuiz.Domain.csproj" />
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <ProjectReference Include="..\..\Shared\Shared.Persistence.MongoDb\Shared.Persistence.MongoDb.csproj" />    
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <PackageReference Include="Shared.Quiz.Persistence.MongoDb" Version="1.0.0" />
   </ItemGroup>
 
-
+  <ItemGroup>
+    <ProjectReference Include="..\AppQuiz.Domain\AppQuiz.Domain.csproj" />
+  </ItemGroup>
 </Project>

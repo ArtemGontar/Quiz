@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AppQuiz.Domain;
 using MediatR;
 
 namespace AppQuiz.Application.Questions.Commands.Update
@@ -7,9 +8,9 @@ namespace AppQuiz.Application.Questions.Commands.Update
     public class UpdateQuestionCommand : IRequest<Guid>
     {
         internal Guid Id { get; set; }
-        public string Text { get; set; }
+        public string Title { get; set; }
         public string CorrectAnswer { get; set; }
-        public List<string> Options { get; set; } = new List<string>();
+        public List<Option> Options { get; set; } = new List<Option>();
         public Guid QuizId { get; set; }
 
         public void SetId(Guid questionId)

@@ -1,22 +1,36 @@
-﻿using AppQuiz.Domain;
+﻿using AppQuiz.Application.Models;
+using AppQuiz.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using AppQuiz.Application.Models;
 
 namespace AppQuiz.Application.Services
 {
     public interface ICheckResultService
     {
-        QuizResult CheckResult(IReadOnlyCollection<Question> questions, IList<string> answers);
+        QuizResult CheckResult(IReadOnlyCollection<string> correctAnswers, IList<string> answers);
     }
 
     public class CheckResultsService : ICheckResultService
     {
-        public QuizResult CheckResult(IReadOnlyCollection<Question> questions, IList<string> answers)
+        public QuizResult CheckResult(IReadOnlyCollection<string> correctAnswers, IList<string> answers)
         {
-            var questionsCount = questions.Count();
-            var correctAnswersCount = questions.Where((x, index) => x.CorrectAnswer == answers[index]).Count();
+            if(correctAnswers == null)
+            {
+                throw new ArgumentNullException(nameof(correctAnswers));
+            }
+            if (answers == null)
+            {
+                throw new ArgumentNullException(nameof(answers));
+            }
+
+            if(correctAnswers.Count != answers.Count)
+            {
+                throw new InvalidOperationException("Different count questions and answers");
+            }
+
+            var questionsCount = correctAnswers.Count();
+            var correctAnswersCount = correctAnswers.Where((x, index) => x == answers[index]).Count();
             var wrongAnswersCount = questionsCount - correctAnswersCount;
             var correctPercent = (double)correctAnswersCount / questionsCount;
             return new QuizResult()

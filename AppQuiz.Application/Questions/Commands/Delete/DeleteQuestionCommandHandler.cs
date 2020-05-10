@@ -3,6 +3,7 @@ using AppQuiz.Domain;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Shared.Persistence.MongoDb;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,7 +23,19 @@ namespace AppQuiz.Application.Questions.Commands.Delete
         public async Task<bool> Handle(DeleteQuestionCommand request, CancellationToken cancellationToken)
         {
             var questionSpecification = new QuestionByIdSpecification(request.QuestionId);
-            return await _questionRepository.DeleteAsync(questionSpecification);
+            if (!await _questionRepository.AnyAsync(questionSpecification))
+            {
+                _logger.LogError($"Question with id {request.QuestionId} not found");
+                throw new InvalidOperationException($"Question with id {request.QuestionId} not found");
+            }
+
+            if (!await _questionRepository.DeleteAsync(questionSpecification))
+            {
+                _logger.LogError($"Delete question failed");
+                throw new InvalidOperationException($"Delete question failed");
+            }
+
+            return true;
         }
     }
 }
