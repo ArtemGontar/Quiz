@@ -1,4 +1,3 @@
-using System;
 using AppQuiz.Application.Infrastructure;
 using AppQuiz.Application.Quizzes.Queries.GetById;
 using AppQuiz.Application.Services;
@@ -19,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Shared.Bus.Messages;
 using Shared.Persistence.MongoDb;
+using System;
 
 namespace AppQuiz.Api
 {
@@ -41,6 +41,7 @@ namespace AppQuiz.Api
                 options.Predicate = (check) => check.Tags.Contains("ready");
             });
 
+
             services.AddSingleton<QuizDbContext>();
             services.AddScoped<IRepository<Chapter>, ChapterRepository>();
             services.AddScoped<IRepository<Quiz>, QuizRepository>();
@@ -50,27 +51,9 @@ namespace AppQuiz.Api
 
             services.AddAutoMapper(typeof(QuizProfile).Assembly);
             services.AddMediatR(typeof(GetQuizByIdQueryHandler).Assembly);
-            services.AddMassTransit(x =>
-            {
-                EndpointConvention.Map<DeleteChapterMessage>(typeof(DeleteChapterMessage).GetReceiveEndpoint());
-                EndpointConvention.Map<QuizResultMessage>(typeof(QuizResultMessage).GetReceiveEndpoint());
-                x.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
-                {
-                    // configure health checks for this bus instance
-                    cfg.UseHealthCheck(provider);
 
-                    cfg.Host("rabbitmq://localhost");
+            AppMassTransit(services);
 
-                    cfg.ReceiveEndpoint("delete-chapter", ep =>
-                    {
-                        ep.PrefetchCount = 16;
-                        ep.UseMessageRetry(r => r.Interval(2, 100));
-                    });
-                }));
-            });
-
-            services.AddMassTransitHostedService();
-            
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())
                 .AddMongoDb(Configuration.GetSection(ConnectionStrings.SECTION_NAME).Get<ConnectionStrings>().Mongo);
@@ -82,36 +65,11 @@ namespace AppQuiz.Api
 
             var identityUrl = Configuration["IdentityUrl"];
 
-            //services.AddAuthorization();
+            AppConfigureAuth(services, identityUrl);
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo()
-                {
-                    Title = "You api title",
-                    Version = "v1"
-                });
-                //c.OperationFilter<AuthorizeCheckOperationFilter>();
-                //c.AddSecurityDefinition("oauth2",
-                //    new OpenApiSecurityScheme()
-                //    {
-                //        Type = SecuritySchemeType.OAuth2,
-                //        Flows = new OpenApiOAuthFlows()
-                //        {
-                //            Implicit = new OpenApiOAuthFlow()
-                //            {
-                //                AuthorizationUrl = new Uri($"{identityUrl}/connect/authorize"),
-                //                TokenUrl = new Uri($"{identityUrl}/connect/token"),
-                //                Scopes = new Dictionary<string, string>
-                //                {
-                //                    {"QuizApi", "Quiz API - full access"}
-                //                },
-                //            }
-                //        }
-                //    });
-            });
+            AppConfigureSwagger(services);
 
-            services.AddControllersWithViews();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -122,22 +80,12 @@ namespace AppQuiz.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();
             //app.UseHttpsRedirection();
 
+            app.UseRouting();
             app.UseCors("AllowAll");
-            
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz API V1");
-                c.OAuthClientId("SwaggerId");
-                c.OAuthAppName("Swagger UI");
-            });
-
-            app.UseAuthentication();
-            
-            app.UseAuthorization();
+            UseConfigureAuth(app);
+            UseConfigureSwagger(app);
 
             app.UseEndpoints(endpoints =>
             {
@@ -170,6 +118,95 @@ namespace AppQuiz.Api
                     // Exclude all checks and return a 200-Ok.
                     Predicate = (_) => false
                 });
+            });
+        }
+
+        protected virtual void AppConfigureAuth(IServiceCollection services, string identityUrl)
+        {
+            services.AddAuthentication("Bearer")
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = identityUrl;
+                    options.RequireHttpsMetadata = false;
+                    options.Audience = "QuizApi";
+                    options.TokenValidationParameters.ValidIssuers = new[]
+                    {
+                        identityUrl
+                    };
+                }).AddCookie();
+
+
+            services.AddAuthorization();
+        }
+
+        protected virtual void AppMassTransit(IServiceCollection services)
+        {
+            services.AddMassTransit(x =>
+            {
+                EndpointConvention.Map<DeleteChapterMessage>(typeof(DeleteChapterMessage).GetReceiveEndpoint());
+                EndpointConvention.Map<QuizResultMessage>(typeof(QuizResultMessage).GetReceiveEndpoint());
+                x.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
+                {
+                    // configure health checks for this bus instance
+                    cfg.UseHealthCheck(provider);
+
+                    cfg.Host("rabbitmq://localhost");
+
+                    cfg.ReceiveEndpoint("delete-chapter", ep =>
+                    {
+                        ep.PrefetchCount = 16;
+                        ep.UseMessageRetry(r => r.Interval(2, 100));
+                    });
+                }));
+            });
+
+            services.AddMassTransitHostedService();
+        }
+
+        protected virtual void AppConfigureSwagger(IServiceCollection services)
+        {
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo()
+                {
+                    Title = "You api title",
+                    Version = "v1"
+                });
+                //c.OperationFilter<AuthorizeCheckOperationFilter>();
+                //c.AddSecurityDefinition("oauth2",
+                //    new OpenApiSecurityScheme()
+                //    {
+                //        Type = SecuritySchemeType.OAuth2,
+                //        Flows = new OpenApiOAuthFlows()
+                //        {
+                //            Implicit = new OpenApiOAuthFlow()
+                //            {
+                //                AuthorizationUrl = new Uri($"{identityUrl}/connect/authorize"),
+                //                TokenUrl = new Uri($"{identityUrl}/connect/token"),
+                //                Scopes = new Dictionary<string, string>
+                //                {
+                //                    {"QuizApi", "Quiz API - full access"}
+                //                },
+                //            }
+                //        }
+                //    });
+            });
+        }
+
+        protected virtual void UseConfigureAuth(IApplicationBuilder app)
+        {
+            app.UseAuthentication();
+            app.UseAuthorization();
+        }
+
+        protected virtual void UseConfigureSwagger(IApplicationBuilder app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quiz API V1");
+                c.OAuthClientId("SwaggerId");
+                c.OAuthAppName("Swagger UI");
             });
         }
     }

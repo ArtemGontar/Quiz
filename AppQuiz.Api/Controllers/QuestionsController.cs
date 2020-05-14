@@ -5,6 +5,7 @@ using AppQuiz.Application.Questions.Queries.GetAll;
 using AppQuiz.Application.Questions.Queries.GetById;
 using AppQuiz.Domain;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace AppQuiz.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/questions")]
     public class QuestionsController : Controller

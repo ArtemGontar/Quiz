@@ -14,9 +14,11 @@ using System.Net;
 using System.Threading.Tasks;
 using AppQuiz.Application.Quizzes.Queries.GetAll;
 using AppQuiz.Application.Quizzes.Queries.GetByChapterId;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AppQuiz.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/chapters")]
     public class ChaptersController : ControllerBase

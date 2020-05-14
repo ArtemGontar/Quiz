@@ -14,9 +14,11 @@ using System.Net;
 using System.Threading.Tasks;
 using AppQuiz.Application.Questions.Queries.GetByQuizId;
 using AppQuiz.Application.Quizzes.Commands.Result;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AppQuiz.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/quizzes")]
     public class QuizzesController : ControllerBase
