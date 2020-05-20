@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using AppQuiz.Application.Quizzes.Queries.GetAll;
 using AppQuiz.Application.Quizzes.Queries.GetByChapterId;
 using Microsoft.AspNetCore.Authorization;
+using AppQuiz.Application.Chapters.Queries.GetByOwnerId;
+using System.Security.Claims;
 
 namespace AppQuiz.Api.Controllers
 {
@@ -39,6 +41,19 @@ namespace AppQuiz.Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var response = await _mediator.Send(new GetAllChapterQuery());
+            //catch if failure
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("byOwner")]
+        [SwaggerOperation("Get all chapters by owner")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(IEnumerable<Chapter>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
+        public async Task<IActionResult> GetAllByOwner()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var response = await _mediator.Send(new GetChaptersByOwnerIdQuery() { OwnerId = userId });
             //catch if failure
             return Ok(response);
         }
