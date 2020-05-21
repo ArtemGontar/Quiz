@@ -1,7 +1,7 @@
-using System;
-using MassTransit;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using System;
 
 namespace AppQuiz.Api
 {
@@ -9,9 +9,27 @@ namespace AppQuiz.Api
     {
         public static void Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
+            Log.Logger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .CreateLogger();
 
-            host.Run();
+            try
+            {
+                var host = CreateHostBuilder(args)
+                    .UseSerilog()
+                    .Build();
+
+                host.Run();
+            }
+            catch(Exception ex)
+            {
+                Log.Fatal(ex, "Application start-up failed");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

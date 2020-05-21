@@ -22,8 +22,7 @@ namespace AppQuiz.UnitTests.ServiceTests
 
 
 
-        [Theory]
-        [InlineData()]
+        [Fact]
         public void CheckResult_AllAnswersRight_ShouldSuccess()
         {
             //Arrange

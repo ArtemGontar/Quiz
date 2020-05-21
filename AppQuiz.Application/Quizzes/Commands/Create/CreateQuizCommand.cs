@@ -12,6 +12,6 @@ namespace AppQuiz.Application.Quizzes.Commands.Create
         public Priority Priority { get; set; }
         public IEnumerable<Question> Questions { get; set; } = new List<Question>();
         public Guid ChapterId { get; set; }
-        internal Guid OwnerId { get; set; }
+        public Guid OwnerId { get; set; }
     }
 }

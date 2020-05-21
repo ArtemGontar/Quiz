@@ -103,6 +103,8 @@ namespace AppQuiz.Api.Controllers
         {
             try
             {
+                var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                createChapterCommand.OwnerId = userId;
                 var response = await _mediator.Send(createChapterCommand); 
                 return Ok(response);
             }

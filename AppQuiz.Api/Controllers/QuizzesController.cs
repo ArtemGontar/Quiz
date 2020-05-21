@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using AppQuiz.Application.Questions.Queries.GetByQuizId;
 using AppQuiz.Application.Quizzes.Commands.Result;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace AppQuiz.Api.Controllers
 {
@@ -80,6 +81,8 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Post([FromBody] CreateQuizCommand createQuizCommand)
         {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            createQuizCommand.OwnerId = userId;
             var response = await _mediator.Send(createQuizCommand);
             //catch if failure
             return Ok(response);

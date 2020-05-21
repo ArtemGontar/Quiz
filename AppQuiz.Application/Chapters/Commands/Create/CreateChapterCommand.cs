@@ -9,5 +9,7 @@ namespace AppQuiz.Application.Chapters.Commands.Create
         public string Name { get; set; }
 
         public EnglishLevel EnglishLevel { get; set; }
+
+        public Guid OwnerId {get;set;}
     }
 }
