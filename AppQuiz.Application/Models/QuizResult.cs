@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AppQuiz.Application.Models
+﻿namespace AppQuiz.Application.Models
 {
     public class QuizResult
     {

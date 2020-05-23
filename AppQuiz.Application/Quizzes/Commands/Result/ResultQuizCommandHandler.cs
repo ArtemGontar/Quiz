@@ -44,6 +44,7 @@ namespace AppQuiz.Application.Quizzes.Commands.Result
             var quizResults = _checkResultService.CheckResult(questions.Select(x => x.CorrectAnswer).ToList(), request.Answers.ToList());
 
             var message = _mapper.Map<QuizResultMessage>(quizResults);
+            
             var endpoint = await _sendEndpointProvider.GetSendEndpoint(message.GetReceiveEndpoint());
             await endpoint.Send(message, cancellationToken);
 
