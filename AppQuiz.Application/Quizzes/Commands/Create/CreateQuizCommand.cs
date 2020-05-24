@@ -9,7 +9,7 @@ namespace AppQuiz.Application.Quizzes.Commands.Create
     public class CreateQuizCommand : IRequest<Guid>
     {
         public string Title { get; set; }
-        public Priority Priority { get; set; }
+        public int Priority { get; set; }
         public IEnumerable<Question> Questions { get; set; } = new List<Question>();
         public Guid ChapterId { get; set; }
         public Guid OwnerId { get; set; }

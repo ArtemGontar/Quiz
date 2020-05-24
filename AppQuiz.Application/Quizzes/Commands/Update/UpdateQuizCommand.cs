@@ -10,7 +10,7 @@ namespace AppQuiz.Application.Quizzes.Commands.Update
     {
         internal Guid Id { get; set; }
         public string Title { get; set; }
-        public Priority Priority { get; set; }
+        public int Priority { get; set; }
         public IEnumerable<Question> Questions { get; set; } = new List<Question>();
         public Guid ChapterId { get; set; }
         internal Guid OwnerId { get; set; }

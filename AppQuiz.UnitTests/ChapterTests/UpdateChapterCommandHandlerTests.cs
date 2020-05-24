@@ -35,7 +35,7 @@ namespace AppQuiz.UnitTests.ChapterTests
             var command = new UpdateChapterCommand()
             {
                 Name = "anonymousName",
-                EnglishLevel = EnglishLevel.Beginner
+                EnglishLevel = (int)EnglishLevel.Beginner
             };
             command.SetId(chapterId);
 
@@ -61,7 +61,7 @@ namespace AppQuiz.UnitTests.ChapterTests
             var command = new UpdateChapterCommand()
             {
                 Name = "anonymousName",
-                EnglishLevel = EnglishLevel.Beginner
+                EnglishLevel = (int)EnglishLevel.Beginner
             };
             command.SetId(chapterId);
 
@@ -82,7 +82,7 @@ namespace AppQuiz.UnitTests.ChapterTests
             var command = new UpdateChapterCommand()
             {
                 Name = "anonymousName",
-                EnglishLevel = EnglishLevel.Beginner
+                EnglishLevel = (int)EnglishLevel.Beginner
             };
             command.SetId(chapterId);
 

@@ -48,7 +48,7 @@ namespace AppQuiz.UnitTests.QuizTests
             var command = new CreateQuizCommand
             {
                 Title = "anonymousQuizTitle",
-                Priority = Priority.Low,
+                Priority = (int)Priority.Low,
                 ChapterId = Guid.NewGuid(),
                 Questions = new List<Question>() { 
                     new Question()
@@ -84,7 +84,7 @@ namespace AppQuiz.UnitTests.QuizTests
             var command = new CreateQuizCommand
             {
                 Title = "anonymousQuizTitle",
-                Priority = Priority.Low,
+                Priority = (int)Priority.Low,
                 ChapterId = Guid.NewGuid(),
                 Questions = new List<Question>() {
                     new Question()
@@ -120,7 +120,7 @@ namespace AppQuiz.UnitTests.QuizTests
             var command = new CreateQuizCommand
             {
                 Title = "anonymousQuizTitle",
-                Priority = Priority.Low,
+                Priority = (int)Priority.Low,
                 Questions = new List<Question>() {
                     new Question()
                     {

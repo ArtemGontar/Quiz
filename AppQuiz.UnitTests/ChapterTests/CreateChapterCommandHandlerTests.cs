@@ -38,7 +38,7 @@ namespace AppQuiz.UnitTests.ChapterTests
             var command = new CreateChapterCommand()
             {
                 Name = "anonymousName",
-                EnglishLevel = EnglishLevel.Beginner
+                EnglishLevel = (int)EnglishLevel.Beginner
             };
 
             _chapterRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))
@@ -60,7 +60,7 @@ namespace AppQuiz.UnitTests.ChapterTests
             var command = new CreateChapterCommand()
             {
                 Name = "anonymousName",
-                EnglishLevel = EnglishLevel.Beginner
+                EnglishLevel = (int)EnglishLevel.Beginner
             };
 
             _chapterRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<Chapter>()))

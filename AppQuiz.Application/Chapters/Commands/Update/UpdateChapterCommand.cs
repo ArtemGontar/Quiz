@@ -10,7 +10,7 @@ namespace AppQuiz.Application.Chapters.Commands.Update
         
         public string Name { get; set; }
 
-        public EnglishLevel EnglishLevel { get; set; }
+        public int EnglishLevel { get; set; }
         public void SetId(Guid chapterId)
         {
             if (chapterId == Guid.Empty)

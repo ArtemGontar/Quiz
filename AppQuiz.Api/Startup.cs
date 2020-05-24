@@ -41,7 +41,6 @@ namespace AppQuiz.Api
                 options.Predicate = (check) => check.Tags.Contains("ready");
             });
 
-
             services.AddSingleton<QuizDbContext>();
             services.AddScoped<IRepository<Chapter>, ChapterRepository>();
             services.AddScoped<IRepository<Quiz>, QuizRepository>();
