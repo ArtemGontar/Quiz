@@ -150,12 +150,6 @@ namespace AppQuiz.Api
                     cfg.UseHealthCheck(provider);
 
                     cfg.Host("rabbitmq://localhost");
-
-                    cfg.ReceiveEndpoint("delete-chapter", ep =>
-                    {
-                        ep.PrefetchCount = 16;
-                        ep.UseMessageRetry(r => r.Interval(2, 100));
-                    });
                 }));
             });
 

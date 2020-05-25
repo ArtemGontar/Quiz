@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AppQuiz.Domain;
+using MediatR;
 using System;
 using System.Collections.Generic;
 
