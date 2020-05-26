@@ -42,8 +42,8 @@ namespace AppQuiz.Application.Quizzes.Commands.Update
 
             if (!await _quizRepository.AnyAsync(new QuizByIdSpecification(request.Id)))
             {
-                _logger.LogError($"Quiz with id {request.ChapterId} was not found");
-                throw new InvalidOperationException($"Quiz with id {request.ChapterId} was not found");
+                _logger.LogError($"Quiz with id {request.Id} was not found");
+                throw new InvalidOperationException($"Quiz with id {request.Id} was not found");
             }
 
             var quiz = _mapper.Map<Quiz>(request);

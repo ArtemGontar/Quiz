@@ -96,7 +96,8 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Put([FromRoute] Guid quizId, [FromBody] UpdateQuizCommand updateQuizCommand)
         {
-            updateQuizCommand.SetIdAndOwnerId(quizId, Guid.Empty);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            updateQuizCommand.SetIdAndOwnerId(quizId, userId);
             var response = await _mediator.Send(updateQuizCommand);
             //catch if failure
             return Ok(response);
@@ -122,7 +123,8 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> PostResult([FromRoute] Guid quizId, [FromBody] IEnumerable<string> answers)
         {
-            var response = await _mediator.Send(new ResultQuizCommand(quizId)
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var response = await _mediator.Send(new ResultQuizCommand(quizId, userId)
             {
                 Answers = answers
             });
