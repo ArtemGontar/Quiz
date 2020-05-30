@@ -65,7 +65,8 @@ namespace AppQuiz.Application.Quizzes.Commands.Result
                 QuestionsCount = quizResult.QuestionsCount,
                 QuizId = quiz.Id,
                 QuizTitle = quiz.Title,
-                UserId = request.UserId
+                UserId = request.UserId,
+                UserName = "Artem Hontar"
             };
 
             var endpoint = await _sendEndpointProvider.GetSendEndpoint(message.GetReceiveEndpoint());
