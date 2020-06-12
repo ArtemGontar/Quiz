@@ -13,7 +13,7 @@ namespace AppQuiz.Application.Questions.Commands.Update
         public List<Option> Options { get; set; } = new List<Option>();
         public Guid QuizId { get; set; }
 
-        public void SetId(Guid questionId)
+        public void SetQuestionId(Guid questionId)
         {
             if (questionId == Guid.Empty)
             {

@@ -70,7 +70,7 @@ namespace AppQuiz.UnitTests.RepositoryTests
         }
 
         [Fact]
-        public void MongoBookDBContext_GetCollection_ValidName_Success()
+        public void MongoQuizDBContext_GetCollection_ValidName_Success()
         {
             //Arrange
             var settings = new ConnectionStrings()

@@ -16,6 +16,7 @@ using AppQuiz.Application.Questions.Queries.GetByQuizId;
 using AppQuiz.Application.Quizzes.Commands.Result;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using OpenTracing;
 
 namespace AppQuiz.Api.Controllers
 {
@@ -26,11 +27,14 @@ namespace AppQuiz.Api.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<QuizzesController> _logger;
-
-        public QuizzesController(IMediator mediator, ILogger<QuizzesController> logger)
+        private readonly ITracer _tracer; 
+        public QuizzesController(IMediator mediator, 
+            ILogger<QuizzesController> logger,
+            ITracer tracer)
         {
             _mediator = mediator;
             _logger = logger;
+            _tracer = tracer;
         }
 
         [HttpGet]
@@ -38,9 +42,12 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(IEnumerable<Quiz>))]
         public async Task<IActionResult> GetAll()
         {
-            var response = await _mediator.Send(new GetAllQuizQuery());
-            //catch if failure
-            return Ok(response);
+            using (var scope = _tracer.BuildSpan("GetAllQuizzes").StartActive(finishSpanOnDispose: true))
+            {
+                var response = await _mediator.Send(new GetAllQuizQuery());
+                //catch if failure
+                return Ok(response);
+            }
         }
 
         [HttpGet]
@@ -51,14 +58,16 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Get([FromQuery] GetQuizByIdQuery query)
         {
-            var response = await _mediator.Send(new GetQuizByIdQuery());
-            if (response == null)
+            using (var scope = _tracer.BuildSpan("GetQuizById").StartActive(finishSpanOnDispose: true))
             {
-                return NotFound($"Question with ID '{query.QuizId}' was not found.");
+                var response = await _mediator.Send(new GetQuizByIdQuery());
+                if (response == null)
+                {
+                    return NotFound($"Question with ID '{query.QuizId}' was not found.");
+                }
+                //catch if failure
+                return Ok(response);
             }
-
-            //catch if failure
-            return Ok(response);
         }
 
         [HttpGet]
@@ -67,12 +76,15 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(IEnumerable<Quiz>))]
         public async Task<IActionResult> GetQuestionsByQuizId([FromRoute] Guid quizId)
         {
-            var response = await _mediator.Send(new GetQuestionsByQuizIdQuery()
+            using (var scope = _tracer.BuildSpan("GetQuestionsByQuizId").StartActive(finishSpanOnDispose: true))
             {
-                QuizId = quizId
-            });
-            //catch if failure
-            return Ok(response);
+                var response = await _mediator.Send(new GetQuestionsByQuizIdQuery()
+                {
+                    QuizId = quizId
+                });
+                //catch if failure
+                return Ok(response);
+            }
         }
 
         [HttpPost]
@@ -81,11 +93,14 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Post([FromBody] CreateQuizCommand createQuizCommand)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            createQuizCommand.OwnerId = userId;
-            var response = await _mediator.Send(createQuizCommand);
-            //catch if failure
-            return Ok(response);
+            using (var scope = _tracer.BuildSpan("CreateQuiz").StartActive(finishSpanOnDispose: true))
+            {
+                var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                createQuizCommand.OwnerId = userId;
+                var response = await _mediator.Send(createQuizCommand);
+                //catch if failure
+                return Ok(response);
+            }
         }
 
         [HttpPut]
@@ -96,11 +111,14 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Put([FromRoute] Guid quizId, [FromBody] UpdateQuizCommand updateQuizCommand)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            updateQuizCommand.SetIdAndOwnerId(quizId, userId);
-            var response = await _mediator.Send(updateQuizCommand);
-            //catch if failure
-            return Ok(response);
+            using (var scope = _tracer.BuildSpan("UpdateQuiz").StartActive(finishSpanOnDispose: true))
+            {
+                var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                updateQuizCommand.SetIdAndOwnerId(quizId, userId);
+                var response = await _mediator.Send(updateQuizCommand);
+                //catch if failure
+                return Ok(response);
+            }
         }
 
         [HttpDelete]
@@ -111,25 +129,31 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Delete([FromRoute] Guid quizId)
         {
-            var response = await _mediator.Send(new DeleteQuizCommand(quizId));
-            //catch if failure
-            return Ok(response);
+            using (var scope = _tracer.BuildSpan("DeleteQuiz").StartActive(finishSpanOnDispose: true))
+            {
+                var response = await _mediator.Send(new DeleteQuizCommand(quizId));
+                //catch if failure
+                return Ok(response);
+            }
         }
 
         [HttpPost]
         [Route("{quizId:guid}/result")]
-        [SwaggerOperation("Create quiz")]
+        [SwaggerOperation("Quiz result")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(Guid))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> PostResult([FromRoute] Guid quizId, [FromBody] IEnumerable<string> answers)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var response = await _mediator.Send(new ResultQuizCommand(quizId, userId)
+            using (var scope = _tracer.BuildSpan("QuizResult").StartActive(finishSpanOnDispose: true))
             {
-                Answers = answers
-            });
-            //catch if failure
-            return Ok(response);
+                var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var response = await _mediator.Send(new ResultQuizCommand(quizId, userId)
+                {
+                    Answers = answers
+                });
+                //catch if failure
+                return Ok(response);
+            }
         }
     }
 }

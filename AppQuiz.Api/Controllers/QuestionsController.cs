@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OpenTracing;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
@@ -23,11 +24,15 @@ namespace AppQuiz.Api.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<QuestionsController> _logger;
+        private readonly ITracer _tracer;
 
-        public QuestionsController(IMediator mediator, ILogger<QuestionsController> logger)
+        public QuestionsController(IMediator mediator, 
+            ILogger<QuestionsController> logger,
+            ITracer tracer)
         {
             _mediator = mediator;
             _logger = logger;
+            _tracer = tracer;
         }
 
         [HttpGet]
@@ -36,9 +41,12 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> GetAll()
         {
-            var response = await _mediator.Send(new GetAllQuestionQuery());
-            //catch if failure
-            return Ok(response);
+            using (var scope = _tracer.BuildSpan("GetAllQuestions").StartActive(finishSpanOnDispose: true))
+            {
+                var response = await _mediator.Send(new GetAllQuestionQuery());
+                //catch if failure
+                return Ok(response);
+            }
         }
 
         [HttpGet]
@@ -49,17 +57,21 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Get([FromQuery] Guid questionId)
         {
-            var response = await _mediator.Send(new GetQuestionByIdQuery()
+            using (var scope = _tracer.BuildSpan("GetQuestionById").StartActive(finishSpanOnDispose: true))
             {
-                QuestionId = questionId
-            });
-            if (response == null)
-            {
-                return NotFound($"Question with ID '{questionId}' was not found.");
-            }
+                var response = await _mediator.Send(new GetQuestionByIdQuery()
+                {
+                    QuestionId = questionId
+                });
+                if (response == null)
+                {
+                    return NotFound($"Question with ID '{questionId}' was not found.");
+                }
 
-            //catch if failure
-            return Ok(response);
+                //catch if failure
+                return Ok(response);
+
+            }
         }
 
         [HttpPost]
@@ -68,9 +80,13 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Post([FromBody] CreateQuestionCommand createQuestionCommand)
         {
-            var response = await _mediator.Send(createQuestionCommand);
-            //catch if failure
-            return Ok(response);
+            using (var scope = _tracer.BuildSpan("CreateQuestion").StartActive(finishSpanOnDispose: true))
+            {
+                var response = await _mediator.Send(createQuestionCommand);
+
+                //catch if failure
+                return Ok(response);
+            }             
         }
 
         [HttpPut]
@@ -81,10 +97,14 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Put([FromRoute] Guid questionId, [FromBody] UpdateQuestionCommand updateQuestionCommand)
         {
-            updateQuestionCommand.SetId(questionId);
-            var response = await _mediator.Send(updateQuestionCommand);
-            //catch if failure
-            return Ok(response);
+            using (var scope = _tracer.BuildSpan("UpdateQuestion").StartActive(finishSpanOnDispose: true))
+            {
+                updateQuestionCommand.SetQuestionId(questionId);
+                var response = await _mediator.Send(updateQuestionCommand);
+
+                //catch if failure
+                return Ok(response);
+            }
         }
 
         [HttpDelete]
@@ -95,7 +115,9 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
         public async Task<IActionResult> Delete([FromRoute] Guid questionId)
         {
+            var scope = _tracer.BuildSpan("DeleteQuestion").Start();
             var response = await _mediator.Send(new DeleteQuestionCommand(questionId));
+            scope.Finish();
             //catch if failure
             return Ok(response);
         }

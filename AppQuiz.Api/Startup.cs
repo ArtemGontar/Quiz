@@ -1,10 +1,14 @@
+using AppQuiz.Api.Data;
 using AppQuiz.Application.Infrastructure;
 using AppQuiz.Application.Quizzes.Queries.GetById;
 using AppQuiz.Application.Services;
 using AppQuiz.Domain;
 using AppQuiz.Persistence;
 using AutoMapper;
-using GreenPipes;
+using OpenTracing;
+using OpenTracing.Util;
+using Jaeger;
+using Jaeger.Samplers;
 using HealthChecks.UI.Client;
 using MassTransit;
 using MediatR;
@@ -53,6 +57,23 @@ namespace AppQuiz.Api
 
             AppMassTransit(services);
 
+            services.AddOpenTracing();
+
+            services.AddSingleton<ITracer>(serviceProvider =>
+            {
+                string serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;
+
+                // This will log to a default localhost installation of Jaeger.
+                var tracer = new Tracer.Builder(serviceName)
+                    .WithSampler(new ConstSampler(true))
+                    .Build();
+
+                // Allows code that can't use DI to also access the tracer.
+                GlobalTracer.Register(tracer);
+
+                return tracer;
+            });
+
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())
                 .AddMongoDb(Configuration.GetSection(ConnectionStrings.SECTION_NAME).Get<ConnectionStrings>().Mongo);
@@ -74,6 +95,8 @@ namespace AppQuiz.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            SeedData.InitializeDatabase(app).GetAwaiter().GetResult();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
