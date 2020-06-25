@@ -56,14 +56,16 @@ namespace AppQuiz.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Success.", typeof(Quiz))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Quiz was not found.")]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, "Internal server error.")]
-        public async Task<IActionResult> Get([FromQuery] GetQuizByIdQuery query)
+        public async Task<IActionResult> Get([FromRoute] Guid quizId)
         {
             using (var scope = _tracer.BuildSpan("GetQuizById").StartActive(finishSpanOnDispose: true))
             {
-                var response = await _mediator.Send(new GetQuizByIdQuery());
+                var response = await _mediator.Send(new GetQuizByIdQuery() { 
+                    QuizId = quizId
+                });
                 if (response == null)
                 {
-                    return NotFound($"Question with ID '{query.QuizId}' was not found.");
+                    return NotFound($"Question with ID '{quizId}' was not found.");
                 }
                 //catch if failure
                 return Ok(response);
