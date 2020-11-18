@@ -17,6 +17,7 @@ namespace AppQuiz.Persistence
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
+
             if (entity.Id == Guid.Empty)
                 entity.Id = Guid.NewGuid();
 
