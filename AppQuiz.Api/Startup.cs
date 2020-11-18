@@ -5,11 +5,9 @@ using AppQuiz.Application.Services;
 using AppQuiz.Domain;
 using AppQuiz.Persistence;
 using AutoMapper;
-using OpenTracing;
-using OpenTracing.Util;
+using HealthChecks.UI.Client;
 using Jaeger;
 using Jaeger.Samplers;
-using HealthChecks.UI.Client;
 using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -20,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using OpenTracing;
+using OpenTracing.Util;
 using Shared.Bus.Messages;
 using Shared.Persistence.MongoDb;
 using System;
@@ -55,7 +55,7 @@ namespace AppQuiz.Api
             services.AddAutoMapper(typeof(QuizProfile).Assembly);
             services.AddMediatR(typeof(GetQuizByIdQueryHandler).Assembly);
 
-            AppMassTransit(services);
+            AddMassTransit(services);
 
             services.AddOpenTracing();
 
@@ -161,8 +161,9 @@ namespace AppQuiz.Api
             services.AddAuthorization();
         }
 
-        protected virtual void AppMassTransit(IServiceCollection services)
+        protected virtual void AddMassTransit(IServiceCollection services)
         {
+            var rabbitMqHost = Configuration["RabbitMqHost"];
             services.AddMassTransit(x =>
             {
                 EndpointConvention.Map<DeleteChapterMessage>(typeof(DeleteChapterMessage).GetReceiveEndpoint());
@@ -172,7 +173,7 @@ namespace AppQuiz.Api
                     // configure health checks for this bus instance
                     cfg.UseHealthCheck(provider);
 
-                    cfg.Host("rabbitmq://localhost");
+                    cfg.Host(rabbitMqHost);
                 }));
             });
 
