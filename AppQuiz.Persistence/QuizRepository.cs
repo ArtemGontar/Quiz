@@ -26,6 +26,8 @@ namespace AppQuiz.Persistence
 
             var update = Update
                 .Set(x => x.Title, entity.Title)
+                .Set(x => x.ChapterId, entity.ChapterId)
+                .Set(x => x.Priority, entity.Priority)
                 .Set(x => x.OwnerId, entity.OwnerId);
                 
             var result = await Collection.UpdateOneAsync(FilterId(entity.Id), update, OptionUpsert);
